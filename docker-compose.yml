@@ -1,0 +1,31 @@
+version: "3"
+services:
+    webserver:
+        build: ./webserver
+        ports:
+            - "3000:3000"
+    database:
+        image: cockroachdb/cockroach
+        command: start --insecure
+        expose:
+         - "8080"
+         - "26257"
+        ports:
+            - "8080:8080"
+            - "26257:26257"
+        volumes:
+            - ./database_volume/:/cockroach/cockroach-data
+    ftpserver:
+        image: stilliard/pure-ftpd:latest
+        ports:
+        - "21:21"
+        - "20:20"
+        - "30000-30009:30000-30009"
+        environment:
+            PUBLICHOST: "localhost"
+            FTP_USER_NAME: "test"
+            FTP_USER_PASS: "test"
+            FTP_USER_HOME: "/home/test"
+        volumes:
+            - ./ftp:/home/test
+        restart: on-failure
